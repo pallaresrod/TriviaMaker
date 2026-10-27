@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.DS_Store
+
+# Saved trivia games (local only)
+trivias/

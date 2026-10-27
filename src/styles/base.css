@@ -1,0 +1,69 @@
+/* Design tokens, reset and page layout shared by every page. */
+
+:root {
+  /* Palette */
+  --blue: #809dfd;
+  --teal: #5ed1c9;
+  --coral: #ff9980;
+  --pink: #f49cbb;
+  --yellow: #ffdd80;
+
+  /* Neutrals: deep navy tinted toward the palette blue */
+  --navy-900: #12152b;
+  --navy-800: #1c2040;
+  --navy-700: #2a2f57;
+  --white: #ffffff;
+
+  /* Roles: use these in components, not the raw palette */
+  --bg: var(--navy-900);
+  --surface: var(--navy-800);
+  --surface-sunken: var(--navy-900);
+  --text: var(--white);
+  --muted: #b7bde3;
+  --on-color: var(--navy-900);      /* text on top of a palette fill */
+  --accent: var(--yellow);          /* main buttons, points, winner */
+  --highlight: var(--pink);         /* whose turn it is */
+  --ok: var(--teal);
+  --danger: var(--coral);
+  --board: var(--blue);
+  --board-hover: #9bb2fd;
+  --board-category: var(--teal);
+  --tile-used: var(--navy-700);
+  --border-subtle: #ffffff1a;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+h1 { margin: 0; font-size: 1.6rem; }
+
+.topbar {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.brand {
+  color: var(--accent);
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+#app {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+}

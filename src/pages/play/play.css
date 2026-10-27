@@ -1,0 +1,140 @@
+/* Header + picker */
+
+.play-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.picker-banner { margin: 0 0 12px; color: var(--muted); font-size: 1.2rem; }
+.picker-banner strong { color: var(--highlight); }
+
+/* Board */
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  padding: 6px;
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.board-category {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  padding: 14px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--board-category);
+  color: var(--on-color);
+  font-size: clamp(.7rem, 1.4vw, 1.1rem);
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+  word-break: break-word;
+}
+
+.board-tile {
+  min-height: clamp(64px, 11vh, 120px);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--board);
+  color: var(--on-color);
+  font: inherit;
+  font-size: clamp(1.2rem, 3.5vw, 2.6rem);
+  font-weight: 800;
+  cursor: pointer;
+}
+.board-tile:hover:not(:disabled) { background: var(--board-hover); }
+.board-tile:disabled {
+  background: var(--tile-used);
+  color: transparent;
+  cursor: default;
+}
+
+/* Scoreboard */
+
+.scoreboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.score {
+  padding: 12px;
+  border: 3px solid transparent;
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-align: center;
+}
+.score.is-picker { border-color: var(--highlight); }
+.score-name { color: var(--muted); font-weight: 600; }
+.score-points { font-size: 2rem; font-weight: 800; }
+
+/* Question modal */
+
+.question-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+  background: var(--board);
+  color: var(--on-color);
+}
+
+.question-modal-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 1000px;
+  text-align: center;
+}
+
+.question-meta {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.question-text {
+  margin: 0;
+  font-size: clamp(1.6rem, 4.5vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: pre-wrap;
+}
+
+.question-answer {
+  margin: 0;
+  padding: 8px 24px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  font-size: clamp(1.2rem, 3vw, 2.2rem);
+  font-weight: 700;
+  white-space: pre-wrap;
+}
+
+.question-who { margin: 12px 0 0; font-weight: 600; }
+
+.question-players { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.question-players .btn { padding: 14px 22px; font-size: 1.1rem; }
+
+/* Light buttons don't read on the blue modal, so use navy instead. */
+.question-modal .btn.secondary { background: var(--on-color); color: var(--white); }
+
+@media (max-width: 640px) {
+  .board { gap: 3px; padding: 3px; }
+  .board-category { min-height: 56px; padding: 6px 2px; }
+}

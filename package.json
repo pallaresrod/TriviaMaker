@@ -1,0 +1,19 @@
+{
+  "name": "trivia-maker",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Create, save and play Jeopardy-style trivia games.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "start": "vite build && vite preview",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  }
+}
