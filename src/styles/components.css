@@ -10,7 +10,9 @@
   text-decoration: none;
   cursor: pointer;
 }
-.btn.primary { background: var(--accent); color: var(--on-color); }
+.btn.primary { background: var(--accent); color: var(--on-accent); }
+.btn.ok { background: var(--ok); color: var(--on-accent); }
+.btn.wrong { background: var(--danger); color: var(--on-accent); }
 .btn.secondary { background: #ffffff1f; color: var(--text); }
 .btn.danger { background: color-mix(in srgb, var(--danger) 20%, transparent); color: var(--danger); }
 .btn.small { padding: 6px 12px; font-size: .9rem; }

@@ -1,0 +1,163 @@
+/* Players' screen: fills the window, big type for a projector or TV. */
+
+body.is-screen .topbar { display: none; }
+body.is-screen #app { max-width: none; padding: 0; }
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  min-height: 100vh;
+  padding: 2.5vh 2.5vw;
+}
+
+.screen-fullscreen { position: fixed; top: 12px; right: 12px; z-index: 5; opacity: .7; }
+.screen-fullscreen:hover { opacity: 1; }
+
+.screen-stage { display: flex; flex: 1; flex-direction: column; justify-content: center; }
+
+/* Waiting */
+
+.screen-waiting { text-align: center; }
+.screen-waiting h1 {
+  color: var(--accent);
+  font-size: clamp(2.5rem, 8vw, 7rem);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.screen-waiting p { color: var(--muted); font-size: clamp(1.2rem, 2.5vw, 2rem); }
+
+/* Board */
+
+.screen-board { display: flex; flex-direction: column; gap: 2vh; }
+.screen-picker { margin: 0; color: var(--muted); font-size: clamp(1.2rem, 2.6vw, 2.2rem); text-align: center; }
+.screen-picker strong { color: var(--highlight); }
+.screen .board-category { min-height: 11vh; font-size: clamp(.9rem, 1.8vw, 1.6rem); }
+.screen .board-tile { min-height: 13vh; font-size: clamp(1.6rem, 5vw, 4.5rem); }
+
+/* Question */
+
+.screen-question {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3vh;
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 5vw;
+  border-radius: var(--radius);
+  background: var(--board);
+  color: var(--on-board);
+  text-align: center;
+}
+
+.screen-meta {
+  margin: 0;
+  color: var(--accent);
+  font-size: clamp(1.1rem, 2.6vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.screen-listen {
+  margin: 0;
+  font-size: clamp(3rem, 10vw, 8rem);
+  font-weight: 800;
+  animation: listen-pulse 2s ease-in-out infinite;
+}
+
+@keyframes listen-pulse {
+  50% { opacity: .55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-listen { animation: none; }
+}
+
+.screen-question-text {
+  margin: 0;
+  max-width: 1400px;
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.2;
+  text-shadow: 2px 2px 0 #00000066;
+  white-space: pre-wrap;
+}
+.screen-question-text.is-small { font-size: clamp(1.4rem, 3vw, 2.6rem); opacity: .85; }
+
+.screen-answer {
+  margin: 0;
+  padding: 1.5vh 3vw;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: clamp(1.8rem, 4.5vw, 4rem);
+  font-weight: 800;
+  white-space: pre-wrap;
+}
+
+.screen-result {
+  margin: 0;
+  padding: 1vh 2.5vw;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  font-size: clamp(1.4rem, 3vw, 2.6rem);
+  font-weight: 800;
+}
+.screen-result.is-correct { background: var(--ok); color: var(--on-accent); }
+
+.screen-attempts { display: flex; flex-wrap: wrap; gap: 1vw; justify-content: center; }
+.screen-attempts:empty { display: none; }
+
+.attempt-chip {
+  padding: .6vh 1.4vw;
+  border-radius: 999px;
+  background: var(--danger);
+  color: var(--on-accent);
+  font-size: clamp(1rem, 2vw, 1.8rem);
+  font-weight: 800;
+}
+
+/* Scores */
+
+.screen-scores { margin-top: 0; }
+.screen .score { padding: 1.4vh 1vw; }
+.screen .score-name { font-size: clamp(1rem, 1.8vw, 1.6rem); }
+.screen .score-points { font-size: clamp(1.8rem, 4vw, 3.5rem); }
+
+/* Final results */
+
+.screen-results {
+  display: flex;
+  flex-direction: column;
+  gap: 3vh;
+  align-items: center;
+  text-align: center;
+}
+.screen-results h1 { color: var(--accent); font-size: clamp(2.5rem, 7vw, 6rem); }
+
+.screen-ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vh;
+  width: min(900px, 90vw);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.screen-ranking li {
+  display: grid;
+  grid-template-columns: 5ch 1fr auto;
+  align-items: center;
+  padding: 1.5vh 2vw;
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: clamp(1.4rem, 3vw, 2.6rem);
+  font-weight: 700;
+  text-align: left;
+}
+.screen-ranking li.is-winner { outline: 3px solid var(--accent); }
+.screen-ranking .ranking-place { color: var(--muted); }
+.screen-ranking .ranking-score { color: var(--accent); }
+.screen-ranking .ranking-score.is-negative { color: var(--danger); }

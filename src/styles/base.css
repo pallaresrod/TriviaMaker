@@ -1,34 +1,33 @@
 /* Design tokens, reset and page layout shared by every page. */
 
 :root {
-  /* Palette */
-  --blue: #809dfd;
-  --teal: #5ed1c9;
-  --coral: #ff9980;
-  --pink: #f49cbb;
-  --yellow: #ffdd80;
-
-  /* Neutrals: deep navy tinted toward the palette blue */
-  --navy-900: #12152b;
-  --navy-800: #1c2040;
-  --navy-700: #2a2f57;
+  /* Palette: "classic quiz show" */
+  --navy: #0a1640;
+  --blue-dark: #12308f;
+  --blue: #1e40c8;
+  --blue-bright: #2f56e8;
+  --gold: #ffc53d;
+  --green: #2bd67b;
+  --red: #ff5a5f;
+  --sky: #7cc4ff;
   --white: #ffffff;
 
   /* Roles: use these in components, not the raw palette */
-  --bg: var(--navy-900);
-  --surface: var(--navy-800);
-  --surface-sunken: var(--navy-900);
+  --bg: var(--navy);
+  --surface: #13225c;
+  --surface-sunken: #08112f;
   --text: var(--white);
-  --muted: #b7bde3;
-  --on-color: var(--navy-900);      /* text on top of a palette fill */
-  --accent: var(--yellow);          /* main buttons, points, winner */
-  --highlight: var(--pink);         /* whose turn it is */
-  --ok: var(--teal);
-  --danger: var(--coral);
+  --muted: #aebbe6;
+  --accent: var(--gold);            /* main buttons, points, winner */
+  --on-accent: var(--navy);         /* text on gold, green or red fills */
+  --highlight: var(--sky);          /* whose turn it is */
+  --ok: var(--green);
+  --danger: var(--red);
   --board: var(--blue);
-  --board-hover: #9bb2fd;
-  --board-category: var(--teal);
-  --tile-used: var(--navy-700);
+  --board-hover: var(--blue-bright);
+  --board-category: var(--blue-dark);
+  --on-board: var(--white);         /* text on blue fills */
+  --tile-used: #101d4d;
   --border-subtle: #ffffff1a;
 
   --radius: 10px;

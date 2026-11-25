@@ -44,10 +44,10 @@
 
 .editor-grid .category-name {
   background: var(--board-category);
-  color: var(--on-color);
+  color: var(--on-board);
   font-size: 1rem;
   font-weight: 700;
   text-align: center;
   text-transform: uppercase;
 }
-.editor-grid .category-name::placeholder { color: color-mix(in srgb, var(--on-color) 55%, transparent); }
+.editor-grid .category-name::placeholder { color: color-mix(in srgb, var(--on-board) 55%, transparent); }

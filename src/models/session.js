@@ -3,11 +3,22 @@
 //
 // {
 //   game,                       // snapshot of the game when it started
-//   players: [{ name, score }],
+//   players: [{ name, score }], // scores can go negative
 //   pickerIndex,                // who picks the next question
 //   usedTiles: ['ci-qi', ...],
-//   currentTile: { ci, qi } | null,
+//   currentTile: null | {
+//     ci, qi,
+//     questionShown,            // is the question text on the players' screen?
+//     attempts: [{ playerIndex, correct, delta }],
+//     status: 'open' | 'closed',
+//     closedBy: null | 'correct' | 'allWrong' | 'nobody',
+//     winnerIndex,              // who got it right (null if nobody)
+//     pickerBefore,             // picker when the tile was chosen (for undo)
+//   },
 // }
+//
+// Question flow: selectTile → (showQuestion) → markWrong* → markCorrect | markNobody
+// (or everyone misses) → closeTile.
 
 import { MAX_PLAYERS, MIN_PLAYERS, TILE_COUNT } from '../constants.js';
 import { cloneGame, isValidGame } from './game.js';
@@ -38,32 +49,146 @@ export function getTile(session, { ci, qi }) {
   return { category, question: category.questions[qi] };
 }
 
-export function selectTile(session, ci, qi) {
-  if (isTileUsed(session, ci, qi)) throw new Error('That question was already played.');
-  return { ...session, currentTile: { ci, qi } };
+function currentPoints(session) {
+  return getTile(session, session.currentTile).question.points;
 }
 
-/** `winnerIndex` is the player who answered correctly, or null for nobody. */
-export function resolveTile(session, winnerIndex) {
-  if (!session.currentTile) throw new Error('No question is open.');
-  const { ci, qi } = session.currentTile;
-  const { points } = session.game.categories[ci].questions[qi];
+function requireOpen(session) {
+  if (session.currentTile?.status !== 'open') throw new Error('No question is open.');
+}
 
-  const players = session.players.map((player, i) =>
-    i === winnerIndex ? { ...player, score: player.score + points } : player);
+function withScore(players, playerIndex, delta) {
+  return players.map((player, i) => (i === playerIndex ? { ...player, score: player.score + delta } : player));
+}
 
+/* ---------- Choosing and showing ---------- */
+
+export function selectTile(session, ci, qi) {
+  if (session.currentTile) throw new Error('Finish the open question first.');
+  if (isTileUsed(session, ci, qi)) throw new Error('That question was already played.');
   return {
     ...session,
-    players,
-    // A correct answer passes the pick to the winner; nobody → same picker again.
-    pickerIndex: winnerIndex ?? session.pickerIndex,
+    currentTile: {
+      ci,
+      qi,
+      questionShown: false,
+      attempts: [],
+      status: 'open',
+      closedBy: null,
+      winnerIndex: null,
+      pickerBefore: session.pickerIndex,
+    },
+  };
+}
+
+export function showQuestion(session) {
+  requireOpen(session);
+  return { ...session, currentTile: { ...session.currentTile, questionShown: true } };
+}
+
+/* ---------- Answering ---------- */
+
+export function hasAttempted(session, playerIndex) {
+  return !!session.currentTile?.attempts.some((a) => a.playerIndex === playerIndex);
+}
+
+export function canAnswer(session, playerIndex) {
+  return session.currentTile?.status === 'open' && !hasAttempted(session, playerIndex);
+}
+
+function requireCanAnswer(session, playerIndex) {
+  requireOpen(session);
+  if (!session.players[playerIndex]) throw new Error('Unknown player.');
+  if (hasAttempted(session, playerIndex)) throw new Error('That player already answered this question.');
+}
+
+/** Wrong answer: lose the points. If everyone has now missed, the question closes. */
+export function markWrong(session, playerIndex) {
+  requireCanAnswer(session, playerIndex);
+  const delta = -currentPoints(session);
+  const attempts = [...session.currentTile.attempts, { playerIndex, correct: false, delta }];
+  const everyoneMissed = attempts.length === session.players.length;
+  return {
+    ...session,
+    players: withScore(session.players, playerIndex, delta),
+    currentTile: {
+      ...session.currentTile,
+      attempts,
+      status: everyoneMissed ? 'closed' : 'open',
+      closedBy: everyoneMissed ? 'allWrong' : null,
+    },
+  };
+}
+
+/** Right answer: win the points and pick next. Closes the question. */
+export function markCorrect(session, playerIndex) {
+  requireCanAnswer(session, playerIndex);
+  const delta = currentPoints(session);
+  return {
+    ...session,
+    players: withScore(session.players, playerIndex, delta),
+    pickerIndex: playerIndex,
+    currentTile: {
+      ...session.currentTile,
+      attempts: [...session.currentTile.attempts, { playerIndex, correct: true, delta }],
+      status: 'closed',
+      closedBy: 'correct',
+      winnerIndex: playerIndex,
+    },
+  };
+}
+
+/** Nobody gets it: no points change, same picker. Closes the question. */
+export function markNobody(session) {
+  requireOpen(session);
+  return { ...session, currentTile: { ...session.currentTile, status: 'closed', closedBy: 'nobody' } };
+}
+
+/* ---------- Fixing mistakes ---------- */
+
+export function canUndo(session) {
+  const tile = session.currentTile;
+  return !!tile && (tile.closedBy === 'nobody' || tile.attempts.length > 0);
+}
+
+/** Reverses the last Correct / Wrong / Nobody on the current question and reopens it. */
+export function undoLastAttempt(session) {
+  if (!canUndo(session)) throw new Error('Nothing to undo.');
+  const tile = session.currentTile;
+  const reopened = { ...tile, status: 'open', closedBy: null, winnerIndex: null };
+
+  if (tile.closedBy === 'nobody') {
+    return { ...session, currentTile: reopened };
+  }
+
+  const last = tile.attempts[tile.attempts.length - 1];
+  return {
+    ...session,
+    players: withScore(session.players, last.playerIndex, -last.delta),
+    pickerIndex: tile.pickerBefore,
+    currentTile: { ...reopened, attempts: tile.attempts.slice(0, -1) },
+  };
+}
+
+/* ---------- Finishing ---------- */
+
+/** Back to the board: the tile is used up. */
+export function closeTile(session) {
+  if (session.currentTile?.status !== 'closed') throw new Error('The question is still open.');
+  const { ci, qi } = session.currentTile;
+  return {
+    ...session,
     usedTiles: [...session.usedTiles, tileKey(ci, qi)],
     currentTile: null,
   };
 }
 
+export function isLastTile(session) {
+  return session.usedTiles.length === TILE_COUNT - 1;
+}
+
 export function isFirstTurn(session) {
-  return session.usedTiles.length === 0;
+  return session.usedTiles.length === 0 && !session.currentTile;
 }
 
 export function isFinished(session) {
@@ -85,6 +210,23 @@ export function getWinners(players) {
   return rankPlayers(players).filter((player) => player.rank === 1);
 }
 
+/* ---------- Validation (for sessions loaded from storage) ---------- */
+
+function isValidCurrentTile(tile, playerCount) {
+  if (tile === null) return true;
+  return (
+    !!tile && typeof tile === 'object' &&
+    Number.isInteger(tile.ci) && Number.isInteger(tile.qi) &&
+    typeof tile.questionShown === 'boolean' &&
+    (tile.status === 'open' || tile.status === 'closed') &&
+    Number.isInteger(tile.pickerBefore) &&
+    Array.isArray(tile.attempts) &&
+    tile.attempts.every((a) =>
+      Number.isInteger(a?.playerIndex) && a.playerIndex >= 0 && a.playerIndex < playerCount &&
+      typeof a.correct === 'boolean' && Number.isFinite(a.delta))
+  );
+}
+
 export function isValidSession(session) {
   if (!session || typeof session !== 'object' || !isValidGame(session.game)) return false;
   const { players, pickerIndex, usedTiles, currentTile } = session;
@@ -94,6 +236,6 @@ export function isValidSession(session) {
     players.every((p) => typeof p?.name === 'string' && Number.isFinite(p.score)) &&
     Number.isInteger(pickerIndex) && pickerIndex >= 0 && pickerIndex < players.length &&
     Array.isArray(usedTiles) &&
-    (currentTile === null || (Number.isInteger(currentTile?.ci) && Number.isInteger(currentTile?.qi)))
+    isValidCurrentTile(currentTile ?? null, players.length)
   );
 }

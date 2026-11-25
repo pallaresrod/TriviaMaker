@@ -3,6 +3,7 @@ import { el, renderTemplate } from '../../utils/dom.js';
 import { getWinners, isFinished, rankPlayers } from '../../models/session.js';
 import { clearSession, getSession } from '../../storage/sessionRepository.js';
 import { navigate, pathTo } from '../../router.js';
+import { formatScore } from '../play/Scoreboard.js';
 
 const template = `
   <section class="page">
@@ -36,7 +37,7 @@ export function ResultsPage(container) {
     el('li', { class: `ranking-row${player.rank === 1 ? ' is-winner' : ''}` }, [
       el('span', { class: 'ranking-place', text: `#${player.rank}` }),
       el('span', { class: 'ranking-name', text: player.name }),
-      el('span', { class: 'ranking-score', text: `${player.score} pts` }),
+      el('span', { class: 'ranking-score', text: `${formatScore(player.score)} pts` }),
     ])));
 
   refs.library.addEventListener('click', () => {

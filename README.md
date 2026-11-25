@@ -34,8 +34,26 @@ trivias/
 A game *in progress* (scores, used questions) is kept in the browser, so it survives a refresh.
 
 ## How it works
-- **Create**: each game has 6 categories with 4 questions each (50, 100, 150, 200 pts). Every question has an answer you can reveal while playing. Incomplete games are saved as drafts and can't be played yet.
-- **Play**: choose 1–4 players. A random player picks the first question. Players answer out loud, then you tap who got it right. That player gets the points and picks next. If nobody gets it right, the same player picks again. The game ends when all 24 questions are used.
+- **Create**: each game has 6 categories with 4 questions each (50, 100, 150, 200 pts), each with an answer. Incomplete games are saved as drafts and can't be played yet.
+- **Start**: choose 1–4 players. A random player picks the first question.
+
+### Two screens
+During a game, click **Open players' screen** on the host page. A second window opens: drag it to the projector or TV and click **Full screen**. Both windows stay in sync automatically.
+
+| Host screen (your laptop) | Players' screen (projector) |
+| --- | --- |
+| Board to pick questions | Same board, read-only, "Ana is picking" |
+| The question to read aloud **and the answer** | Only the category and value, "Listen…" |
+| **Show question on screen** button | The question text, once you click it |
+| ✓ Correct / ✗ Wrong per player, Nobody, Undo last | Wrong answers as they happen, then the answer and who got it |
+
+### Scoring
+1. Read the question aloud. If someone buzzes in before you finish, stop reading. Otherwise click **Show question on screen** when you're done.
+2. **✓ Correct**: the player gains the points, picks the next question, and the question closes.
+3. **✗ Wrong**: the player loses the points (scores can go below zero) and can't answer that question again. Other players can still try. If everyone misses, the question closes.
+4. **Nobody got it**: no points change and the same player picks again.
+5. **Undo last** reverses the last button you pressed on that question.
+6. Click **Back to board**. The game ends when all 24 questions are used.
 
 ## Project structure
 ```
@@ -53,10 +71,12 @@ src/                       Runs in the browser
   api/gamesApi.js          Calls the games server
   models/                  Game rules, shared by browser and server (unit tested)
     game.js                Create / validate / duplicate / import-export games
-    session.js             Playing: pick tile, award points, ranking
-  storage/                 Browser storage: the game in progress
+    session.js             Playing: pick tile, show question, right/wrong, undo, ranking
+  storage/                 Browser storage: the game in progress (also syncs the two screens)
   pages/                   One folder per screen: page, its components, its CSS
-    library/  editor/  setup/  play/  results/
+    library/  editor/  setup/  results/
+    play/                  Host view: board, scoreboard, host question panel
+    screen/                Players' screen for the projector (#/screen)
   styles/                  Colour palette, reset and shared components
   utils/                   DOM helpers, file download/upload
 ```

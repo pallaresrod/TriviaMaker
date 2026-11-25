@@ -2,6 +2,7 @@
 
 .play-header {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: center;
   justify-content: space-between;
@@ -11,7 +12,7 @@
 .picker-banner { margin: 0 0 12px; color: var(--muted); font-size: 1.2rem; }
 .picker-banner strong { color: var(--highlight); }
 
-/* Board */
+/* Board (also used read-only on the players' screen) */
 
 .board {
   display: grid;
@@ -19,7 +20,7 @@
   gap: 6px;
   padding: 6px;
   border-radius: var(--radius);
-  background: var(--bg);
+  background: var(--surface-sunken);
 }
 
 .board-category {
@@ -30,7 +31,7 @@
   padding: 14px 6px;
   border-radius: var(--radius-sm);
   background: var(--board-category);
-  color: var(--on-color);
+  color: var(--on-board);
   font-size: clamp(.7rem, 1.4vw, 1.1rem);
   font-weight: 800;
   text-align: center;
@@ -39,24 +40,30 @@
 }
 
 .board-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-height: clamp(64px, 11vh, 120px);
   border: 0;
   border-radius: var(--radius-sm);
   background: var(--board);
-  color: var(--on-color);
+  color: var(--accent);
   font: inherit;
   font-size: clamp(1.2rem, 3.5vw, 2.6rem);
   font-weight: 800;
-  cursor: pointer;
+  text-shadow: 2px 2px 0 #00000066;
 }
-.board-tile:hover:not(:disabled) { background: var(--board-hover); }
-.board-tile:disabled {
+button.board-tile { cursor: pointer; }
+button.board-tile:hover:not(:disabled) { background: var(--board-hover); }
+.board-tile:disabled,
+.board-tile.is-used {
   background: var(--tile-used);
   color: transparent;
+  text-shadow: none;
   cursor: default;
 }
 
-/* Scoreboard */
+/* Scoreboard (also used on the players' screen) */
 
 .scoreboard {
   display: grid;
@@ -75,66 +82,104 @@
 .score.is-picker { border-color: var(--highlight); }
 .score-name { color: var(--muted); font-weight: 600; }
 .score-points { font-size: 2rem; font-weight: 800; }
+.score-points.is-negative { color: var(--danger); }
 
-/* Question modal */
+/* Host question panel */
 
-.question-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  overflow-y: auto;
-  background: var(--board);
-  color: var(--on-color);
-}
-
-.question-modal-inner {
+.host-question {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  width: 100%;
-  max-width: 1000px;
-  text-align: center;
+  gap: 16px;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: var(--surface);
 }
 
-.question-meta {
+.host-question-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.host-question-meta {
   margin: 0;
-  font-weight: 700;
+  color: var(--accent);
+  font-weight: 800;
   letter-spacing: 1px;
   text-transform: uppercase;
 }
 
-.question-text {
+.screen-status {
   margin: 0;
-  font-size: clamp(1.6rem, 4.5vw, 3.4rem);
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  color: var(--muted);
+  font-size: .9rem;
+}
+.screen-status.is-shown {
+  background: color-mix(in srgb, var(--highlight) 20%, transparent);
+  color: var(--highlight);
+}
+
+.host-question-text {
+  margin: 0;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.3;
   white-space: pre-wrap;
 }
 
-.question-answer {
-  margin: 0;
-  padding: 8px 24px;
+.host-answer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border: 2px dashed var(--accent);
   border-radius: var(--radius);
-  background: var(--accent);
-  font-size: clamp(1.2rem, 3vw, 2.2rem);
-  font-weight: 700;
-  white-space: pre-wrap;
 }
+.host-answer-label { color: var(--muted); font-size: .85rem; }
+.host-answer-text { color: var(--accent); font-size: 1.3rem; font-weight: 800; white-space: pre-wrap; }
 
-.question-who { margin: 12px 0 0; font-weight: 600; }
+.host-question > .btn.primary { align-self: flex-start; padding: 14px 24px; font-size: 1.1rem; }
 
-.question-players { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-.question-players .btn { padding: 14px 22px; font-size: 1.1rem; }
+.host-players { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
 
-/* Light buttons don't read on the blue modal, so use navy instead. */
-.question-modal .btn.secondary { background: var(--on-color); color: var(--white); }
+.host-player {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 14px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+}
+.host-player.is-correct { border-color: var(--ok); }
+.host-player.is-wrong { opacity: .7; }
+.host-player-name { font-size: 1.1rem; font-weight: 700; }
+.host-player-score { color: var(--muted); font-weight: 700; min-width: 4ch; text-align: right; }
+.host-player-actions { display: flex; gap: 6px; }
+.host-player-result { min-width: 9rem; color: var(--muted); font-weight: 800; text-align: right; }
+.host-player-result.is-correct { color: var(--ok); }
+.host-player-result.is-wrong { color: var(--danger); }
+
+.host-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+.host-footer-actions { display: flex; gap: 8px; margin-left: auto; }
+.host-result { margin: 0; font-size: 1.2rem; font-weight: 800; }
+.host-result.is-correct { color: var(--ok); }
 
 @media (max-width: 640px) {
   .board { gap: 3px; padding: 3px; }
   .board-category { min-height: 56px; padding: 6px 2px; }
+  .host-player { grid-template-columns: 1fr auto; }
+  .host-player > :last-child { grid-column: 1 / -1; justify-self: end; }
 }
